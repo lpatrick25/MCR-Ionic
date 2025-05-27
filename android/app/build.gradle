@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.capstone.project"
+    namespace "com.mcr.scanner"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.capstone.projects"
+        applicationId "com.mcr.scanner"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

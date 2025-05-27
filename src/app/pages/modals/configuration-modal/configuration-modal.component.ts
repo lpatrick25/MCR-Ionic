@@ -79,9 +79,43 @@ export class ConfigurationModalComponent implements OnInit {
   }
 
   /**
-   * Initializes the component.
+   * Initializes the component and loads the saved configuration from local storage.
    */
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadSavedConfig();
+  }
+
+  /**
+   * Loads the saved PDF configuration from local storage and patches the form.
+   */
+  private loadSavedConfig(): void {
+    try {
+      const savedConfig = localStorage.getItem('pdfConfig');
+      if (savedConfig) {
+        const options: CreatePDFOptions = JSON.parse(savedConfig);
+
+        // Validate that the saved values are valid options
+        if (
+          this.pageSizes.includes(options.pageSize!) &&
+          this.pageDirections.includes(options.pageDirection!) &&
+          this.pageFitModes.includes(options.pageFitMode!)
+        ) {
+          this.configForm.patchValue({
+            pageSize: options.pageSize,
+            pageDirection: options.pageDirection,
+            pageFitMode: options.pageFitMode,
+          });
+        } else {
+          console.warn('Invalid saved configuration values, using defaults.');
+        }
+      }
+    } catch (error: any) {
+      console.error(
+        'Failed to load PDF configuration from local storage:',
+        error
+      );
+    }
+  }
 
   /**
    * Saves the selected configuration to local storage and dismisses the modal.

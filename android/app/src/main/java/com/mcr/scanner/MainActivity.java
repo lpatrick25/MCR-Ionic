@@ -1,4 +1,4 @@
-package com.capstone.project;
+package com.mcr.scanner;
 
 import com.getcapacitor.BridgeActivity;
 

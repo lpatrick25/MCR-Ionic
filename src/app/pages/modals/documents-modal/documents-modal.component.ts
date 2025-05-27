@@ -46,25 +46,11 @@ export class DocumentsModalComponent implements OnInit {
   constructor(
     private modalController: ModalController,
     private router: Router,
-    private toastCtrl: ToastController,
+    private toastCtrl: ToastController
   ) {}
 
   ngOnInit() {}
 
-  // async selectDocument(type: string, title: string) {
-  //   // this.router.navigate(['/document-form', type, encodeURIComponent(title)]);
-  //   const modal = await this.modalController.create({
-  //     component: ConfigurationModalComponent,
-  //     cssClass: 'configuration-modal',
-  //     componentProps: {
-  //       type: type,
-  //       title: title,
-  //     },
-  //   });
-
-  //   await modal.present();
-  //   // await this.modalController.dismiss({ type, title });
-  // }
   async selectDocument(type: string, title: string): Promise<void> {
     try {
       const modal = await this.modalController.create({
@@ -83,11 +69,20 @@ export class DocumentsModalComponent implements OnInit {
         await this.modalController.dismiss({ type, title });
         await this.showToast('PDF configuration saved!', 'success');
         // Navigate to document-form after saving
-        await this.router.navigate([
-          '/document-form',
-          type,
-          encodeURIComponent(title),
-        ]);
+
+        if (type === 'marriage') {
+          await this.router.navigate([
+            '/document-form-marriage',
+            type,
+            encodeURIComponent(title),
+          ]);
+        } else {
+          await this.router.navigate([
+            '/document-form',
+            type,
+            encodeURIComponent(title),
+          ]);
+        }
       }
     } catch (error: any) {
       console.error('Error opening configuration modal:', error);

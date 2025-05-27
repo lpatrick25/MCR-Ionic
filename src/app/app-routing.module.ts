@@ -39,6 +39,10 @@ const routes: Routes = [
     path: 'form-result/:documentID',
     loadChildren: () => import('./pages/documents/form-result/form-result.module').then( m => m.FormResultPageModule)
   },
+  {
+    path: 'document-form-marriage/:type/:title',
+    loadChildren: () => import('./pages/documents/form-marriage/form-marriage.module').then( m => m.FormMarriagePageModule)
+  },
 ];
 
 @NgModule({

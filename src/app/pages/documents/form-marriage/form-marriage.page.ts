@@ -6,44 +6,55 @@ import {
   ToastController,
 } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import {
   ScanbotSDK,
   ScanbotSdkConfiguration,
 } from 'capacitor-plugin-scanbot-sdk';
 import {
   DocumentScanningFlow,
-  PageSnapFunnelAnimation,
   startDocumentScanner,
 } from 'capacitor-plugin-scanbot-sdk/ui_v2';
 import { AuthService } from 'src/app/services/auth.service';
 import { SettingsModalComponent } from '../../modals/settings-modal/settings-modal.component';
 import { LicenseKeyModalComponent } from '../../modals/license-key-modal/license-key-modal.component';
-import { environment } from 'src/environments/environment';
 import { ApiUrlModalComponent } from '../../modals/api-url-modal/api-url-modal.component';
+import { environment } from 'src/environments/environment';
 
 interface DocumentSubmission {
   documentType: string;
   documentTitle: string;
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  suffix: string;
-  dob: string;
-  placeOfBirth: string;
-  fatherName: string;
-  motherName: string;
+  husband: {
+    firstName: string;
+    husbandMiddleName: string;
+    husbandLastName: string;
+    husbandSuffix: string;
+    husbandDob: string;
+    husbandPlaceOfBirth: string;
+    husbandFatherName?: string;
+    husbandMotherName?: string;
+  };
+  wife: {
+    firstName: string;
+    wifeMiddleName: string;
+    wifeLastName: string;
+    wifeSuffix: string;
+    wifeDob: string;
+    wifePlaceOfBirth: string;
+    wifeFatherName?: string;
+    wifeMotherName?: string;
+  };
   registryNumber: string;
   documentUuid: string;
 }
 
 @Component({
-  selector: 'app-form',
-  templateUrl: './form.page.html',
-  styleUrls: ['./form.page.scss'],
+  selector: 'app-form-marriage',
+  templateUrl: './form-marriage.page.html',
+  styleUrls: ['./form-marriage.page.scss'],
   standalone: false,
 })
-export class FormPage implements OnInit {
+export class FormMarriagePage implements OnInit {
   form: FormGroup;
   documentType: string = '';
   documentTitle: string = '';
@@ -66,15 +77,30 @@ export class FormPage implements OnInit {
     private http: HttpClient
   ) {
     this.form = this.fb.group({
-      firstName: ['', Validators.required],
-      middleName: [''],
-      lastName: ['', Validators.required],
-      suffix: [''],
-      dob: ['', Validators.required],
-      placeOfBirth: ['', Validators.required],
-      fatherName: [''],
-      motherName: [''],
-      registryNumber: ['', Validators.required],
+      husband: this.fb.group({
+        firstName: ['', Validators.required],
+        husbandMiddleName: [''],
+        husbandLastName: ['', Validators.required],
+        husbandSuffix: [''],
+        husbandDob: ['', Validators.required],
+        husbandPlaceOfBirth: ['', Validators.required],
+        husbandFatherName: [''],
+        husbandMotherName: [''],
+      }),
+      wife: this.fb.group({
+        firstName: ['', Validators.required],
+        wifeMiddleName: [''],
+        wifeLastName: ['', Validators.required],
+        wifeSuffix: [''],
+        wifeDob: ['', Validators.required],
+        wifePlaceOfBirth: ['', Validators.required],
+        wifeFatherName: [''],
+        wifeMotherName: [''],
+      }),
+      registryNumber: [
+        '',
+        [Validators.required, Validators.pattern('^\\d{4}-\\d{3}$')],
+      ],
     });
   }
 
@@ -82,17 +108,10 @@ export class FormPage implements OnInit {
     this.route.paramMap.subscribe((params) => {
       this.documentType = params.get('type') || '';
       this.documentTitle = decodeURIComponent(params.get('title') || '');
-      if (this.documentType === 'marriage') {
-        this.form.get('fatherName')?.disable();
-        this.form.get('motherName')?.disable();
-      }
     });
     await this.initScanbotSdk();
   }
 
-  /**
-   * Submits the form data and scans a document, sending both to the backend.
-   */
   async submitForm(): Promise<void> {
     this.formSubmitted = true;
     if (this.form.invalid) {
@@ -107,79 +126,54 @@ export class FormPage implements OnInit {
 
     this.loading = true;
     try {
-      /**
-       * Create the document configuration object and
-       * start the document scanner with the configuration
-       */
       const configuration = new DocumentScanningFlow();
-      // Enable the multiple page behavior
       configuration.outputSettings.pagesScanLimit = 0;
-
-      // Enable/Disable Auto Snapping behavior
       configuration.screens.camera.cameraConfiguration.autoSnappingEnabled =
         true;
-
-      // Hide/Reveal the auto snapping enable/disable button
       configuration.screens.camera.bottomBar.autoSnappingModeButton.visible =
         true;
       configuration.screens.camera.bottomBar.manualSnappingModeButton.visible =
         true;
-
-      // Set colors
       configuration.palette.sbColorPrimary = '#800000';
       configuration.palette.sbColorOnPrimary = '#ffffff';
-
-      // Configure the hint texts for different scenarios
       configuration.screens.camera.userGuidance.statesTitles.tooDark =
         'Need more lighting to detect a document';
       configuration.screens.camera.userGuidance.statesTitles.tooSmall =
         'Document too small';
       configuration.screens.camera.userGuidance.statesTitles.noDocumentFound =
         'Could not detect a document';
-
-      // Enable/Disable the review screen.
       configuration.screens.review.enabled = true;
-
-      // Configure bottom bar (further properties like title, icon and  background can also be set for these buttons)
       configuration.screens.review.bottomBar.addButton.visible = true;
       configuration.screens.review.bottomBar.retakeButton.visible = true;
       configuration.screens.review.bottomBar.cropButton.visible = true;
       configuration.screens.review.bottomBar.rotateButton.visible = true;
       configuration.screens.review.bottomBar.deleteButton.visible = true;
-
-      // Configure `more` popup on review screen
       configuration.screens.review.morePopup.reorderPages.icon.visible = true;
       configuration.screens.review.morePopup.deleteAll.icon.visible = true;
       configuration.screens.review.morePopup.deleteAll.title.text =
         'Delete all pages';
-
-      // Configure reorder pages screen
       configuration.screens.reorderPages.topBarTitle.text = 'Reorder Pages';
       configuration.screens.reorderPages.guidance.title.text = 'Reorder Pages';
-
-      // Configure cropping screen
       configuration.screens.cropping.topBarTitle.text = 'Cropping Screen';
       configuration.screens.cropping.bottomBar.resetButton.visible = true;
       configuration.screens.cropping.bottomBar.rotateButton.visible = true;
       configuration.screens.cropping.bottomBar.detectButton.visible = true;
 
       const documentResult = await startDocumentScanner(configuration);
-      /**
-       * Handle the result if result status is OK
-       */
-      if (documentResult.status === 'OK') {
-        this.router.navigate(['/document-result', documentResult.uuid]);
+      if (documentResult.status !== 'OK') {
+        throw new Error('Document scanning failed or was cancelled.');
       }
 
       const submission: DocumentSubmission = {
         documentType: this.documentType,
         documentTitle: this.documentTitle,
-        ...this.form.value,
+        husband: this.form.get('husband')?.value,
+        wife: this.form.get('wife')?.value,
+        registryNumber: this.form.get('registryNumber')?.value,
         documentUuid: documentResult.uuid,
       };
 
       this.hasSubmitted = true;
-      // await this.showToast('Document submitted successfully!', 'success');
       await this.router.navigate(['/form-result', documentResult.uuid], {
         state: { submission },
       });
@@ -194,9 +188,6 @@ export class FormPage implements OnInit {
     }
   }
 
-  /**
-   * Opens the settings modal for license key or logout actions.
-   */
   async presentSettingsModal() {
     const modal = await this.modalController.create({
       component: SettingsModalComponent,
@@ -238,9 +229,6 @@ export class FormPage implements OnInit {
     await modal.present();
   }
 
-  /**
-   * Opens the license key modal to update the Scanbot SDK license key.
-   */
   async presentLicenseKeyDialog(): Promise<void> {
     const storedKey = localStorage.getItem('customLicenseKey') || '';
     const modal = await this.modalController.create({
@@ -255,7 +243,6 @@ export class FormPage implements OnInit {
       const data = result.data;
       if (data?.licenseKey?.trim()) {
         const sanitizedKey = this.sanitizeLicenseKey(data.licenseKey);
-
         if (this.isValidLicenseKey(sanitizedKey)) {
           localStorage.setItem('customLicenseKey', sanitizedKey);
           this.showToast('License key updated successfully.', 'success');
@@ -273,14 +260,9 @@ export class FormPage implements OnInit {
   }
 
   isValidLicenseKey(key: string): boolean {
-    // Basic length check (Scanbot keys are long, usually >500 chars)
-    // You can also add more logic if Scanbot provides a regex or pattern
     return typeof key === 'string' && key.length > 400;
   }
 
-  /**
-   * Initializes the Scanbot SDK with the provided configuration.
-   */
   private async initScanbotSdk(): Promise<void> {
     const config: ScanbotSdkConfiguration = {
       licenseKey: this.defaultLicenseKey,
@@ -288,10 +270,10 @@ export class FormPage implements OnInit {
       storageImageFormat: 'JPG',
       storageImageQuality: 80,
       documentDetectorMode: 'ML_BASED',
-      fileEncryptionMode: FormPage.FILE_ENCRYPTION_ENABLED
+      fileEncryptionMode: FormMarriagePage.FILE_ENCRYPTION_ENABLED
         ? 'AES256'
         : undefined,
-      fileEncryptionPassword: FormPage.FILE_ENCRYPTION_ENABLED
+      fileEncryptionPassword: FormMarriagePage.FILE_ENCRYPTION_ENABLED
         ? 'SomeSecretPa$$w0rdForFileEncryption'
         : undefined,
     };
@@ -305,18 +287,10 @@ export class FormPage implements OnInit {
     }
   }
 
-  /**
-   * Navigates back to the home page.
-   */
   cancel(): void {
     this.navCtrl.navigateBack('/home');
   }
 
-  /**
-   * Displays a toast notification with the specified message and color.
-   * @param message The message to display.
-   * @param color The toast color (primary, success, warning, danger).
-   */
   private async showToast(
     message: string,
     color: string = 'primary'
