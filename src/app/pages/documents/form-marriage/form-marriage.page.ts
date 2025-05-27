@@ -97,10 +97,7 @@ export class FormMarriagePage implements OnInit {
         wifeFatherName: [''],
         wifeMotherName: [''],
       }),
-      registryNumber: [
-        '',
-        [Validators.required, Validators.pattern('^\\d{4}-\\d{3}$')],
-      ],
+      registryNumber: ['', Validators.required],
     });
   }
 

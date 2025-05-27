@@ -138,12 +138,20 @@ export class FormResultPage implements OnInit {
     try {
       const savedConfig = localStorage.getItem('pdfConfig');
       if (!savedConfig) {
+        console.warn(
+          'No PDF configuration found in localStorage, using defaults'
+        );
         return defaultOptions;
       }
 
-      const parsedConfig: CreatePDFOptions = JSON.parse(savedConfig);
+      const parsedConfig = JSON.parse(savedConfig);
 
-      // Validate options
+      // Ensure parsedConfig is an object
+      if (!parsedConfig || typeof parsedConfig !== 'object') {
+        console.error('Invalid PDF configuration: not an object');
+        return defaultOptions;
+      }
+
       const validPageSizes: PageSize[] = [
         'LETTER',
         'LEGAL',
@@ -172,19 +180,32 @@ export class FormResultPage implements OnInit {
       ];
 
       const validatedConfig: CreatePDFOptions = {
-        pageSize: validPageSizes.includes(parsedConfig.pageSize as PageSize)
-          ? parsedConfig.pageSize
-          : defaultOptions.pageSize,
-        pageDirection: validPageDirections.includes(
-          parsedConfig.pageDirection as PageDirection
-        )
-          ? parsedConfig.pageDirection
-          : defaultOptions.pageDirection,
-        pageFitMode: validPageFitModes.includes(
-          parsedConfig.pageFitMode as PDFPageFitMode
-        )
-          ? parsedConfig.pageFitMode
-          : defaultOptions.pageFitMode,
+        pageSize:
+          typeof parsedConfig.pageSize === 'string' &&
+          validPageSizes.includes(parsedConfig.pageSize as PageSize)
+            ? parsedConfig.pageSize
+            : (console.warn(
+                `Invalid pageSize: ${parsedConfig.pageSize}, using default`
+              ),
+              defaultOptions.pageSize),
+        pageDirection:
+          typeof parsedConfig.pageDirection === 'string' &&
+          validPageDirections.includes(
+            parsedConfig.pageDirection as PageDirection
+          )
+            ? parsedConfig.pageDirection
+            : (console.warn(
+                `Invalid pageDirection: ${parsedConfig.pageDirection}, using default`
+              ),
+              defaultOptions.pageDirection),
+        pageFitMode:
+          typeof parsedConfig.pageFitMode === 'string' &&
+          validPageFitModes.includes(parsedConfig.pageFitMode as PDFPageFitMode)
+            ? parsedConfig.pageFitMode
+            : (console.warn(
+                `Invalid pageFitMode: ${parsedConfig.pageFitMode}, using default`
+              ),
+              defaultOptions.pageFitMode),
       };
 
       return validatedConfig;

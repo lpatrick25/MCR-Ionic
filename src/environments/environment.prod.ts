@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://192.168.100.185/api',
+  apiUrl: 'https://192.168.100.123/api',
   licenseKey:
     'RpXRwiXfjAO6Dem0mC9azY9ArjHttn' +
     'Nyg1M2MIOhtsCFn18yGWQspd/f68uI' +
