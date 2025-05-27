@@ -1,0 +1,112 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button
+        defaultHref="/home"
+        aria-label="Back to home page"
+        class="back-button"
+      ></ion-back-button>
+    </ion-buttons>
+    <ion-title class="header-title">
+      <ion-icon name="document-outline" class="header-icon"></ion-icon>
+      Municipal Records
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        class="settings-button"
+        (click)="presentSettingsModal()"
+        aria-label="Open settings menu"
+      >
+        <ion-icon name="settings-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding content-background" [fullscreen]="true">
+  <!-- Search Bar -->
+  <ion-searchbar
+    [(ngModel)]="searchText"
+    debounce="300"
+    (ionInput)="filterDocuments()"
+    placeholder="Search by name or document type"
+    showClearButton="focus"
+    class="custom-searchbar"
+    aria-label="Search documents"
+  ></ion-searchbar>
+
+  <!-- Loading Spinner -->
+  <div class="spinner-container" *ngIf="isLoading">
+    <ion-spinner name="crescent" class="custom-spinner"></ion-spinner>
+  </div>
+
+  <!-- No Documents Found -->
+  <ion-card
+    *ngIf="filteredDocuments.length === 0 && !isLoading"
+    class="no-documents-card"
+    role="alert"
+  >
+    <ion-card-content class="no-documents-content">
+      <ion-icon name="document-outline" class="no-documents-icon"></ion-icon>
+      <ion-label class="no-documents-title"
+        >No documents found matching your search.</ion-label
+      >
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Document Grid -->
+  <ion-grid
+    *ngIf="filteredDocuments.length > 0 && !isLoading"
+    class="document-grid"
+  >
+    <ion-row class="ion-justify-content-center">
+      <ion-col
+        size="12"
+        size-sm="6"
+        size-md="4"
+        *ngFor="let doc of filteredDocuments"
+      >
+        <ion-card
+          (click)="openDocumentModal(doc)"
+          class="document-card"
+          role="button"
+          [attr.aria-label]="'View ' + formatText(getFullName(doc)) + ' document'"
+        >
+          <div class="pdf-container">
+            <!-- <pdf-viewer
+              [src]="doc.pdf_url"
+              [render-text]="false"
+              [original-size]="false"
+              [show-all]="false"
+              [page]="1"
+              [zoom]="0.5"
+              (error)="onPdfError(doc, $event)"
+              class="pdf-viewer"
+            ></pdf-viewer> -->
+          </div>
+          <ion-card-header class="card-header">
+            <ion-card-title class="document-title"
+              >{{ formatText(getFullName(doc)) }}</ion-card-title
+            >
+            <ion-card-subtitle class="document-subtitle"
+              >{{ formatText(doc.document_type) }}</ion-card-subtitle
+            >
+          </ion-card-header>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Infinite Scroll -->
+  <ion-infinite-scroll
+    threshold="100px"
+    (ionInfinite)="loadMoreDocuments($event)"
+    [disabled]="isLoadingMore || currentPage >= lastPage"
+  >
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading more documents..."
+      class="infinite-scroll-content"
+    ></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

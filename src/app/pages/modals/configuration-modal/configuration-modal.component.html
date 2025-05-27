@@ -1,0 +1,133 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-title>Configure PDF Options</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()" aria-label="Close modal">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" [fullscreen]="true">
+  <ion-card class="config-card">
+    <ion-card-header>
+      <ion-card-title class="config-heading">PDF Configuration</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <form [formGroup]="configForm" (ngSubmit)="save()">
+        <ion-list lines="none">
+          <!-- Page Size -->
+          <ion-item class="config-item">
+            <ion-label class="config-label">Page Size *</ion-label>
+            <ion-select
+              formControlName="pageSize"
+              placeholder="Select page size"
+              aria-required="true"
+              interface="popover"
+            >
+              <ion-select-option
+                *ngFor="let size of pageSizes"
+                [value]="size"
+                >{{ size }}</ion-select-option
+              >
+            </ion-select>
+            <ion-text
+              color="danger"
+              *ngIf="
+                configForm.get('pageSize')?.invalid &&
+                configForm.get('pageSize')?.touched
+              "
+            >
+              Page Size is required
+            </ion-text>
+          </ion-item>
+
+          <!-- Page Direction -->
+          <ion-item class="config-item">
+            <ion-label class="config-label">Page Direction *</ion-label>
+            <ion-select
+              formControlName="pageDirection"
+              placeholder="Select page direction"
+              aria-required="true"
+              interface="popover"
+            >
+              <ion-select-option
+                *ngFor="let direction of pageDirections"
+                [value]="direction"
+                >{{ direction }}</ion-select-option
+              >
+            </ion-select>
+            <ion-text
+              color="danger"
+              *ngIf="
+                configForm.get('pageDirection')?.invalid &&
+                configForm.get('pageDirection')?.touched
+              "
+            >
+              Page Direction is required
+            </ion-text>
+          </ion-item>
+
+          <!-- Page Fit Mode -->
+          <ion-item class="config-item">
+            <ion-label class="config-label">Page Fit Mode *</ion-label>
+            <ion-select
+              formControlName="pageFitMode"
+              placeholder="Select page fit mode"
+              aria-required="true"
+              interface="popover"
+            >
+              <ion-select-option
+                *ngFor="let mode of pageFitModes"
+                [value]="mode"
+                >{{ mode }}</ion-select-option
+              >
+            </ion-select>
+            <ion-text
+              color="danger"
+              *ngIf="
+                configForm.get('pageFitMode')?.invalid &&
+                configForm.get('pageFitMode')?.touched
+              "
+            >
+              Page Fit Mode is required
+            </ion-text>
+          </ion-item>
+        </ion-list>
+
+        <!-- Buttons -->
+        <div class="button-container">
+          <ion-button
+            type="submit"
+            expand="block"
+            color="warning"
+            [disabled]="loading || configForm.invalid"
+            class="save-button"
+            aria-label="Save configuration"
+          >
+            <ion-icon
+              name="save-outline"
+              slot="start"
+              *ngIf="!loading"
+            ></ion-icon>
+            <ion-spinner name="crescent" *ngIf="loading"></ion-spinner>
+            <span *ngIf="!loading">Save</span>
+          </ion-button>
+          <ion-button
+            expand="block"
+            fill="outline"
+            color="medium"
+            (click)="cancel()"
+            [disabled]="loading"
+            class="cancel-button"
+            aria-label="Cancel configuration"
+          >
+            <ion-icon name="close-outline" slot="start"></ion-icon>
+            Cancel
+          </ion-button>
+        </div>
+      </form>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

@@ -1,0 +1,188 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+ion-header {
+  --background: #800000;
+  font-family: "Inter", sans-serif;
+}
+
+ion-toolbar {
+  --background: #800000;
+  --color: #ffffff;
+  --border-style: none;
+}
+
+ion-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+ion-button {
+  --color: #ffd700;
+}
+
+ion-content {
+  --background: #f5f5f5;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+}
+
+ion-card.config-card {
+  margin: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background: #ffffff;
+  font-family: "Inter", sans-serif;
+}
+
+ion-card-header {
+  padding: 12px;
+  background: #800000;
+}
+
+ion-card-title.config-heading {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+}
+
+ion-card-content {
+  padding: 12px;
+}
+
+ion-list {
+  background: transparent;
+  margin-bottom: 16px;
+}
+
+ion-item.config-item {
+  --background: #ffffff;
+  --border-color: #e0e0e0;
+  --padding-start: 0;
+  --padding-end: 0;
+  margin-bottom: 12px;
+  border-radius: 6px;
+}
+
+ion-item.config-item.invalid {
+  --border-color: #d32f2f;
+}
+
+ion-label.config-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4px;
+}
+
+ion-select {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  font-size: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  width: 100%;
+}
+
+ion-select::part(text) {
+  color: #333333;
+}
+
+ion-select:focus {
+  border-color: #800000;
+}
+
+ion-text[color="danger"] {
+  font-size: 0.85rem;
+  padding: 4px 8px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+ion-button.save-button {
+  --background: #ffd700;
+  --color: #800000;
+  --border-radius: 6px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  height: 46px;
+  transition: transform 0.2s ease;
+}
+
+ion-button.save-button:hover {
+  transform: scale(1.03);
+}
+
+ion-button.save-button:active {
+  transform: scale(0.97);
+}
+
+ion-button.cancel-button {
+  --border-color: #800000;
+  --color: #800000;
+  --border-radius: 6px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  height: 46px;
+  transition: transform 0.2s ease;
+}
+
+ion-button.cancel-button:hover {
+  transform: scale(1.03);
+}
+
+ion-button.cancel-button:active {
+  transform: scale(0.97);
+}
+
+ion-icon {
+  font-size: 20px;
+  margin-right: 8px;
+}
+
+ion-spinner {
+  margin-right: 8px;
+}
+
+@media (max-width: 600px) {
+  ion-card.config-card {
+    margin: 8px;
+  }
+
+  ion-card-title.config-heading {
+    font-size: 1.2rem;
+  }
+
+  ion-item.config-item {
+    margin-bottom: 8px;
+  }
+
+  ion-label.config-label {
+    font-size: 0.9rem;
+  }
+
+  ion-select {
+    font-size: 0.95rem;
+  }
+
+  ion-button.save-button,
+  ion-button.cancel-button {
+    font-size: 0.95rem;
+    height: 42px;
+  }
+
+  ion-icon {
+    font-size: 18px;
+  }
+}
